@@ -12,7 +12,9 @@ export PATH="/home/hemanth209/.local/bin:/home/hemanth209/.nvm/versions/node/v20
 
 echo "🌾 Starting Kissan Drishti Full-Stack Application..."
 
-# 1. Start Python FastAPI Backend
+# Free ports 8000 & 5173 if left open by a previous run
+fuser -k 8000/tcp 5173/tcp 2>/dev/null || true
+rm -f /tmp/cloudflared.log /tmp/kd_vite.log
 cd "$PROJECT_ROOT/backend"
 if [ ! -d "venv" ]; then
     echo "Creating virtual environment..."
