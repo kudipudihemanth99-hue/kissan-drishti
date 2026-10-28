@@ -7,5 +7,6 @@ env/
 ENV/
 .env
 .env.*
+!.env.example
 .pytest_cache/
 .coverage

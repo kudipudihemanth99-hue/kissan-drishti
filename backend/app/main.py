@@ -19,24 +19,28 @@ app = FastAPI(
 allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
 frontend_url_env = os.getenv("FRONTEND_URL", "")
 
+default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 if allowed_origins_env:
     # Comma-separated origins provided (e.g. "https://app.vercel.app,https://custom.domain")
     if allowed_origins_env.strip() == "*":
         origins = ["*"]
     else:
-        origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+        parsed = [o.strip().rstrip("/") for o in allowed_origins_env.split(",") if o.strip()]
+        origins = list(dict.fromkeys(default_origins + parsed))
 else:
-    # Default development origins
-    origins = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "*"
-    ]
+    # Default development / permissive origins
+    origins = ["*"]
 
-if frontend_url_env and frontend_url_env not in origins and "*" not in origins:
-    origins.append(frontend_url_env.strip())
+if frontend_url_env:
+    clean_frontend = frontend_url_env.strip().rstrip("/")
+    if clean_frontend and clean_frontend not in origins and "*" not in origins:
+        origins.append(clean_frontend)
 
 app.add_middleware(
     CORSMiddleware,
